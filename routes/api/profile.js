@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
+const Post = require('../../models/Post');
 
 //@route GET api/profile/me
 //@description Get current users profile
@@ -139,13 +140,14 @@ router.get('/user/:user_id', async (req, res) => {
 //@access Private
 router.delete('/', auth, async (req, res) => {
   try {
-    //@todo Remove posts
-
-    //Remove User
-    await Profile.findOneAndDelete({ user: req.user.id });
+    //Remove user's posts
+    await Post.deleteMany({ user: req.user.id });
 
     //Remove Profile
-    await Profile.findOneAndDelete({ _id: req.user.id });
+    await Profile.findOneAndDelete({ user: req.user.id });
+
+    //Remove User
+    await User.findOneAndDelete({ _id: req.user.id });
 
     res.send('User deleted');
   } catch (err) {
